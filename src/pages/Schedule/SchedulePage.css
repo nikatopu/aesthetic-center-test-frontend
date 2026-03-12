@@ -1,6 +1,5 @@
 .schedule-page {
   background: white;
-  border-radius: 12px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -33,7 +32,12 @@
   padding: 12px 16px;
   text-align: center;
   border-right: 1px solid #e5e7eb;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5em;
 }
 
 .header-cell img {
@@ -41,7 +45,6 @@
   height: 32px;
   border-radius: 50%;
   display: block;
-  margin: 0 auto 8px auto;
   border: 2px solid white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -50,6 +53,7 @@
   font-weight: 700;
   color: #1f2937;
   font-size: 14px;
+  text-align: left;
 }
 
 .time-header-cell {
@@ -57,18 +61,11 @@
   min-width: 80px;
   flex-shrink: 0;
   padding: 12px 8px;
-  text-align: center;
-  border-right: 1px solid #e5e7eb;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: var(--bg);
 }
 
 .time-header-cell span {
-  font-weight: 700;
-  color: #475569;
-  font-size: 12px;
+  display: none;
 }
 
 .time-column {
@@ -77,23 +74,24 @@
   flex-shrink: 0;
   border-right: 1px solid #e5e7eb;
   position: relative;
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .time-slot-label {
   height: 30px;
   font-size: 11px;
   font-weight: 600;
-  color: #64748b;
+  color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
   position: relative;
+  transform: translateY(-50%);
+  z-index: 25;
+  background: var(--bg);
 }
 
 .time-slot-label:nth-child(odd) {
-  background: rgba(248, 250, 252, 0.8);
   font-weight: 700;
   color: #475569;
 }
@@ -130,7 +128,7 @@
 }
 
 .grid-slot:nth-child(odd) {
-  border-bottom-color: rgba(229, 231, 235, 0.6);
+  border-bottom-color: transparent;
 }
 
 .grid-slot:hover {

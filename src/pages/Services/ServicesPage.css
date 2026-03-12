@@ -1,60 +1,11 @@
 .services-page {
-  padding: 24px;
-  max-width: 1400px;
+  max-width: 50em;
   margin: 0 auto;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.page-header h1 {
-  font-size: 32px;
-  font-weight: 800;
-  color: #1f2937;
-  margin: 0;
-  letter-spacing: -0.025em;
-}
-
-.actions {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
-.page-header input {
-  padding: 12px 16px;
-  border: 2px solid #d1d5db;
-  border-radius: 12px;
-  width: 300px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  background: white;
-}
-
-.page-header input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  transform: translateY(-1px);
-}
-
-.page-header input::placeholder {
-  color: #9ca3af;
-}
-
 .table-container {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
+  background-color: transparent;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .services-table {
@@ -63,10 +14,9 @@
 }
 
 .services-table th {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background-color: transparent;
   padding: 16px 20px;
   text-align: left;
-  border-bottom: 2px solid #e5e7eb;
   font-weight: 700;
   font-size: 14px;
   color: #374151;
@@ -192,6 +142,7 @@
 .services-table td {
   padding: 16px 20px;
   border-bottom: 1px solid #f3f4f6;
+  background: white;
   font-size: 14px;
   color: #374151;
   vertical-align: middle;
@@ -230,14 +181,17 @@
 .price-cell {
   font-family: "Courier New", monospace;
   font-weight: 600;
-  color: #059669;
+  color: #3498db !important;
   font-size: 15px;
 }
 
+.services-price-head {
+  width: 3em;
+}
+
 .action-col {
-  width: 120px;
+  width: 40px;
   text-align: center;
-  background: #f8fafc !important;
 }
 
 .add-col-btn {
@@ -263,44 +217,6 @@
   display: flex;
   gap: 8px;
   justify-content: center;
-}
-
-.action-btn {
-  background: none;
-  border: 2px solid transparent;
-  border-radius: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.action-btn.edit {
-  color: #3b82f6;
-  border-color: #dbeafe;
-  background: #eff6ff;
-}
-
-.action-btn.edit:hover {
-  background: #3b82f6;
-  color: white;
-  transform: translateY(-1px);
-}
-
-.action-btn.delete {
-  color: #ef4444;
-  border-color: #fecaca;
-  background: #fef2f2;
-}
-
-.action-btn.delete:hover {
-  background: #ef4444;
-  color: white;
-  transform: translateY(-1px);
 }
 
 .empty-state {
@@ -342,41 +258,6 @@
 
 .column-drag-handle:active {
   cursor: grabbing;
-}
-
-/* Responsive design */
-@media (max-width: 1024px) {
-  .services-page {
-    padding: 16px;
-  }
-
-  .page-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-
-  .actions {
-    justify-content: space-between;
-  }
-
-  .page-header input {
-    width: 100%;
-    max-width: none;
-  }
-
-  .table-container {
-    overflow-x: auto;
-  }
-
-  .services-table {
-    min-width: 600px;
-  }
-
-  .services-table th,
-  .services-table td {
-    padding: 12px 16px;
-  }
 }
 
 @media (max-width: 640px) {

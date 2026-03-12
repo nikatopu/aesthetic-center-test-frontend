@@ -2,24 +2,9 @@ import { useState, useEffect } from "react";
 import { Modal } from "../../atoms/Modal";
 import { Button } from "../../atoms/Button";
 import { useToast } from "../../atoms/Toast/ToastProvider";
-import {  useGlobalContext } from "../../../store/GlobalContext";
+import { useGlobalContext } from "../../../store/GlobalContext";
 import { ServiceAPI } from "../../../api/client";
 import "./ServiceModal.css";
-
-const PREDEFINED_COLORS = [
-  "#3b82f6", // Blue
-  "#ef4444", // Red
-  "#10b981", // Green
-  "#f59e0b", // Yellow
-  "#8b5cf6", // Purple
-  "#f97316", // Orange
-  "#ec4899", // Pink
-  "#06b6d4", // Cyan
-  "#84cc16", // Lime
-  "#6366f1", // Indigo
-  "#14b8a6", // Teal
-  "#f43f5e", // Rose
-];
 
 export const ServiceModal = ({ isOpen, onClose, data, onSave }) => {
   const { customFields, refreshData } = useGlobalContext();
@@ -27,7 +12,7 @@ export const ServiceModal = ({ isOpen, onClose, data, onSave }) => {
   const [form, setForm] = useState({
     name: "",
     price: "",
-    color: PREDEFINED_COLORS[0],
+    color: "#3b82f6",
     customValues: {},
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,7 +26,7 @@ export const ServiceModal = ({ isOpen, onClose, data, onSave }) => {
       setForm({
         name: "",
         price: "",
-        color: PREDEFINED_COLORS[0],
+        color: "#3b82f6",
         customValues: {},
       });
     }
@@ -78,7 +63,7 @@ export const ServiceModal = ({ isOpen, onClose, data, onSave }) => {
     setForm({
       name: "",
       price: "",
-      color: PREDEFINED_COLORS[0],
+      color: "#3b82f6",
       customValues: {},
     });
     onClose();
@@ -95,13 +80,9 @@ export const ServiceModal = ({ isOpen, onClose, data, onSave }) => {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      title={data?.id ? "Edit Service" : "Add New Service"}
-      onClose={handleClose}
-    >
+    <Modal isOpen={isOpen} title="Edit Service" onClose={handleClose}>
       <form onSubmit={handleSubmit} className="service-form">
-        <div className="form-row">
+        <div className="service-row">
           <div className="form-group">
             <label htmlFor="serviceName">Service Name *</label>
             <input
@@ -115,7 +96,9 @@ export const ServiceModal = ({ isOpen, onClose, data, onSave }) => {
               autoFocus
             />
           </div>
+        </div>
 
+        <div className="service-row">
           <div className="form-group">
             <label htmlFor="servicePrice">Price ($) *</label>
             <input
@@ -129,69 +112,54 @@ export const ServiceModal = ({ isOpen, onClose, data, onSave }) => {
               required
             />
           </div>
-        </div>
-
-        <div className="form-group">
-          <label>Color (Schedule Block) *</label>
-          <div className="color-palette">
-            {PREDEFINED_COLORS.map((color) => (
-              <div
-                key={color}
-                className={`color-swatch ${form.color === color ? "active" : ""}`}
-                style={{ backgroundColor: color }}
-                onClick={() => setForm({ ...form, color })}
-                title={color}
-              />
-            ))}
+          <div className="form-group">
+            <label htmlFor="serviceColor">Service Color *</label>
+            <input
+              id="serviceColor"
+              type="color"
+              value={form.color}
+              onChange={(e) => setForm({ ...form, color: e.target.value })}
+              required
+            />
           </div>
-          <small className="color-help">
-            This color will be used for reservation blocks in the schedule
-          </small>
         </div>
 
-        {/* Dynamic Custom Fields */}
         {customFields.length > 0 && (
-          <div className="custom-fields-section">
-            <h4>Custom Fields</h4>
-            <div className="custom-fields-grid">
-              {customFields.map((field) => (
-                <div className="form-group" key={field.id}>
-                  <label htmlFor={`custom-${field.id}`}>{field.label}</label>
-                  <input
-                    id={`custom-${field.id}`}
-                    type="text"
-                    value={form.customValues[field.id] || ""}
-                    onChange={(e) =>
-                      updateCustomValue(field.id, e.target.value)
-                    }
-                    placeholder={`Enter ${field.label.toLowerCase()}`}
-                    maxLength={200}
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="service-row">
+            {customFields.map((field) => (
+              <div className="form-group" key={field.id}>
+                <label htmlFor={`custom-${field.id}`}>{field.label}</label>
+                <input
+                  id={`custom-${field.id}`}
+                  type="text"
+                  value={form.customValues[field.id] || ""}
+                  onChange={(e) => updateCustomValue(field.id, e.target.value)}
+                  placeholder={`Enter ${field.label.toLowerCase()}`}
+                  maxLength={200}
+                />
+              </div>
+            ))}
           </div>
         )}
 
-        <div className="modal-footer">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || !form.name.trim() || !form.price}
-          >
-            {isSubmitting
-              ? "Saving..."
-              : data?.id
-                ? "Update Service"
-                : "Create Service"}
-          </Button>
+        <div className="service-row">
+          <div className="modal-footer">
+            <Button
+              type="submit"
+              disabled={isSubmitting || !form.name.trim() || !form.price}
+            >
+              {isSubmitting ? "Saving..." : "Save"}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
       </form>
     </Modal>

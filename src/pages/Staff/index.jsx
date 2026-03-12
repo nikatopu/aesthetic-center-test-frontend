@@ -67,16 +67,20 @@ const StaffPage = () => {
   return (
     <div className="staff-page">
       <div className="page-header">
-        <h1>Staff Management</h1>
-        <div className="actions">
-          <input
-            type="text"
-            placeholder="Search by name or surname..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Button onClick={handleAddNew}>+ Add New Staff</Button>
+        <div className="page-title">
+          <h1>Staff</h1>
+
+          <Button onClick={handleAddNew} variant="secondary">
+            + Add new
+          </Button>
         </div>
+
+        <input
+          type="text"
+          placeholder="Search by name or surname..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
       {filteredStaff.length === 0 ? (
@@ -89,7 +93,7 @@ const StaffPage = () => {
           </p>
         </div>
       ) : (
-        <div className="staff-grid">
+        <div className="staff-container">
           {filteredStaff.map((staff) => (
             <div key={staff.id} className="staff-card">
               <div className="staff-header">
@@ -117,14 +121,14 @@ const StaffPage = () => {
                   onClick={() => handleEdit(staff)}
                   disabled={isDeleting === staff.id}
                 >
-                  ✏️ Edit
+                  ✏️
                 </button>
                 <button
                   className="action-btn delete"
                   onClick={() => handleDelete(staff)}
                   disabled={isDeleting === staff.id}
                 >
-                  🗑️ {isDeleting === staff.id ? "Deleting..." : "Delete"}
+                  🗑️
                 </button>
               </div>
             </div>

@@ -31,25 +31,8 @@ export const CustomFieldModal = ({ isOpen, onClose, onSave }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} title="Add Custom Field" onClose={handleClose}>
+    <Modal isOpen={isOpen} title="Add New Column" onClose={handleClose}>
       <div className="custom-field-modal">
-        <div className="field-explanation">
-          <p>
-            Create a new custom field that will appear as a column in your
-            services table. This allows you to track additional information for
-            each service.
-          </p>
-          <div className="examples">
-            <strong>Examples:</strong>
-            <ul>
-              <li>Duration</li>
-              <li>Category</li>
-              <li>Skill Level</li>
-              <li>Equipment Needed</li>
-            </ul>
-          </div>
-        </div>
-
         <form onSubmit={handleSubmit} className="field-form">
           <div className="form-group">
             <label htmlFor="fieldName">Field Name *</label>
@@ -63,27 +46,19 @@ export const CustomFieldModal = ({ isOpen, onClose, onSave }) => {
               required
               autoFocus
             />
-            <div className="field-requirements">
-              <small>
-                • Must be between 1-50 characters
-                <br />
-                • Use clear, descriptive names
-                <br />• Cannot be changed after creation
-              </small>
-            </div>
           </div>
 
           <div className="modal-footer">
+            <Button type="submit" disabled={!fieldName.trim() || isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Field"}
+            </Button>
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={handleClose}
               disabled={isSubmitting}
             >
               Cancel
-            </Button>
-            <Button type="submit" disabled={!fieldName.trim() || isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Field"}
             </Button>
           </div>
         </form>

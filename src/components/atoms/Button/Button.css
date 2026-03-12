@@ -11,6 +11,24 @@
   color: white;
 }
 
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid #3498db;
+  color: #3498db;
+
+  width: 100%;
+  max-width: 9em;
+
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #3498db;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
 .btn-danger {
   background: #e74c3c;
   color: white;

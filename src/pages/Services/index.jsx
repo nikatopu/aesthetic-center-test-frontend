@@ -198,16 +198,20 @@ const ServicesPage = () => {
   return (
     <div className="services-page">
       <div className="page-header">
-        <h1>Services Management</h1>
-        <div className="actions">
-          <input
-            type="text"
-            placeholder="Search by name or custom fields..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Button onClick={handleAddNew}>+ Add Service</Button>
+        <div className="page-title">
+          <h1>Services</h1>
+
+          <Button onClick={handleAddNew} variant="secondary">
+            + Add new
+          </Button>
         </div>
+
+        <input
+          type="text"
+          placeholder="Search by name or custom fields..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
       {filteredServices.length === 0 && searchTerm ? (
@@ -221,7 +225,7 @@ const ServicesPage = () => {
             <thead>
               <tr>
                 <th>Service</th>
-                <th>Price</th>
+                <th className="services-price-head">Price</th>
                 {orderedCustomFields.map((field) => (
                   <th
                     key={field.id}
@@ -269,13 +273,8 @@ const ServicesPage = () => {
                   </th>
                 ))}
                 <th className="action-col">
-                  <button
-                    onClick={() => setIsFieldModalOpen(true)}
-                    className="add-col-btn"
-                    title="Add Custom Field"
-                  >
-                    + Field
-                  </button>
+                  <Button variant="secondary" onClick={() => setIsFieldModalOpen(true)}> 
+                    +</Button>
                 </th>
               </tr>
             </thead>
@@ -308,14 +307,14 @@ const ServicesPage = () => {
                           onClick={() => handleEdit(service)}
                           disabled={isDeleting === service.id}
                         >
-                          ✏️ Edit
+                          ✏️
                         </button>
                         <button
                           className="action-btn delete"
                           onClick={() => handleDelete(service)}
                           disabled={isDeleting === service.id}
                         >
-                          🗑️ {isDeleting === service.id ? "..." : "Delete"}
+                          🗑️
                         </button>
                       </div>
                     </td>

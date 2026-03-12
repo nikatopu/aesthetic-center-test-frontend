@@ -17,6 +17,7 @@ export const ReservationModal = ({
   const [serviceSearch, setServiceSearch] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hasDeletedServices, setHasDeletedServices] = useState(false);
+  const [selectedServices, setSelectedServices] = useState([]);
 
   // Provide default values to prevent null/undefined errors
   const getDefaultFormData = () => ({
@@ -37,7 +38,6 @@ export const ReservationModal = ({
     // Check for deleted services if editing existing reservation
     if (initialData?.service_ids) {
       const validation = validateServiceIds(initialData.service_ids, services);
-
       setHasDeletedServices(validation.hasDeleted);
 
       // Update form data with only valid service IDs
@@ -45,9 +45,16 @@ export const ReservationModal = ({
         ...defaultData,
         service_ids: validation.validIds,
       });
+
+      // Set selected services for display
+      const validServices = services.filter((service) =>
+        validation.validIds.includes(service.id),
+      );
+      setSelectedServices(validServices);
     } else {
       setFormData(defaultData);
       setHasDeletedServices(false);
+      setSelectedServices([]);
     }
 
     setServiceSearch("");
@@ -86,14 +93,63 @@ export const ReservationModal = ({
     { value: 240, label: "4 hours" },
   ];
 
-  // Calculate end time
-  const getEndTime = (startTime, durationMinutes) => {
-    if (!startTime) return "";
-    const [hours, minutes] = startTime.split(":").map(Number);
-    const totalMinutes = hours * 60 + minutes + durationMinutes;
-    const endHours = Math.floor(totalMinutes / 60);
-    const endMins = totalMinutes % 60;
-    return `${endHours.toString().padStart(2, "0")}:${endMins.toString().padStart(2, "0")}`;
+  // Generate time options for appointment time dropdown
+  const generateTimeOptions = () => {
+    const times = [];
+    for (let hour = 8; hour < 22; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const timeValue = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+        const timeLabel = new Date(
+          `1970-01-01T${timeValue}:00`,
+        ).toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+        times.push({ value: timeValue, label: timeLabel });
+      }
+    }
+    return times;
+  };
+
+  const timeOptions = generateTimeOptions();
+
+  // Add service to selected list
+  const addService = (service) => {
+    if (!selectedServices.find((s) => s.id === service.id)) {
+      const newSelectedServices = [...selectedServices, service];
+      setSelectedServices(newSelectedServices);
+      setFormData({
+        ...formData,
+        service_ids: newSelectedServices.map((s) => s.id),
+      });
+    }
+    setServiceSearch("");
+  };
+
+  // Remove service from selected list
+  const removeService = (serviceId) => {
+    const newSelectedServices = selectedServices.filter(
+      (s) => s.id !== serviceId,
+    );
+    setSelectedServices(newSelectedServices);
+    setFormData({
+      ...formData,
+      service_ids: newSelectedServices.map((s) => s.id),
+    });
+  };
+
+  // Calculate total price
+  const calculateTotal = () => {
+    return selectedServices
+      .reduce((total, service) => total + parseFloat(service.price || 0), 0)
+      .toFixed(2);
+  };
+
+  // Get selected specialist name
+  const getSpecialistName = () => {
+    const specialist = specialists.find((s) => s.id === formData.specialist_id);
+    return specialist ? specialist.name : "No specialist selected";
   };
 
   return (
@@ -110,139 +166,220 @@ export const ReservationModal = ({
         />
       ) : (
         <form onSubmit={handleSubmit} className="reservation-form">
-          <div className="form-row">
+          {/* First Row - Selected Specialist */}
+          <div className="form-row specialist-row">
             <div className="form-group">
-              <label htmlFor="date">Date</label>
-              <input
-                id="date"
-                type="date"
-                value={formData.reservation_date}
-                onChange={(e) =>
-                  setFormData({ ...formData, reservation_date: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="time">Start Time</label>
-              <input
-                id="time"
-                type="time"
-                value={formData.start_time}
-                onChange={(e) =>
-                  setFormData({ ...formData, start_time: e.target.value })
-                }
-                required
-              />
+              <label htmlFor="specialist">Name</label>
+              <div className="specialist-display">
+                {formData.specialist_id ? (
+                  getSpecialistName()
+                ) : (
+                  <select
+                    id="specialist"
+                    value={formData.specialist_id || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        specialist_id: parseInt(e.target.value),
+                      })
+                    }
+                    required
+                  >
+                    <option value="">Select Specialist</option>
+                    {specialists.map((spec) => (
+                      <option key={spec.id} value={spec.id}>
+                        {spec.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="form-row">
+          {/* Second Row - Date, Appt. Time, Duration with SVG icons */}
+          <div className="form-row details-row">
             <div className="form-group">
-              <label htmlFor="specialist">Specialist</label>
-              <select
-                id="specialist"
-                value={formData.specialist_id || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    specialist_id: parseInt(e.target.value),
-                  })
-                }
-                required
-              >
-                <option value="">Select Specialist</option>
-                {specialists.map((spec) => (
-                  <option key={spec.id} value={spec.id}>
-                    {spec.name}
-                  </option>
-                ))}
-              </select>
+              <label htmlFor="date">Date</label>
+              <div className="input-with-icon">
+                <input
+                  id="date"
+                  type="date"
+                  value={formData.reservation_date}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      reservation_date: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="time">Appt. Time</label>
+              <div className="input-with-icon">
+                <svg
+                  className="input-icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                    stroke="#3498db"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12.0059 6.99805V11.9981L16.0059 13.9981"
+                    stroke="#3498db"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <select
+                  id="time"
+                  value={formData.start_time}
+                  onChange={(e) =>
+                    setFormData({ ...formData, start_time: e.target.value })
+                  }
+                  required
+                >
+                  <option value="">Select Time</option>
+                  {timeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="form-group">
               <label htmlFor="duration">Duration</label>
-              <select
-                id="duration"
-                value={formData.duration_minutes}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    duration_minutes: parseInt(e.target.value),
-                  })
-                }
-                required
-              >
-                {durationOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              <div className="input-with-icon">
+                <svg
+                  className="input-icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 7V12L14.5 14.5"
+                    stroke="#3498db"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                    stroke="#3498db"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <select
+                  id="duration"
+                  value={formData.duration_minutes}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      duration_minutes: parseInt(e.target.value),
+                    })
+                  }
+                  required
+                >
+                  {durationOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
-          {formData.start_time && (
-            <div className="time-range-display">
-              <strong>Time Range:</strong> {formData.start_time} -{" "}
-              {getEndTime(formData.start_time, formData.duration_minutes)}
+          {/* Third Row - Service Search */}
+          <div className="form-row search-row">
+            <div className="form-group">
+              <label htmlFor="service-search">Search Services</label>
+              {hasDeletedServices && (
+                <div className="warning-message">
+                  ⚠️ Warning: Some services from this reservation have been
+                  deleted. They have been automatically removed from the
+                  selection.
+                </div>
+              )}
+              <input
+                id="service-search"
+                type="text"
+                placeholder="Search and add services..."
+                value={serviceSearch}
+                onChange={(e) => setServiceSearch(e.target.value)}
+                className="service-search"
+              />
+              {serviceSearch && (
+                <div className="search-results">
+                  {filteredServices.map((service) => (
+                    <div
+                      key={service.id}
+                      className="search-result-item"
+                      onClick={() => addService(service)}
+                    >
+                      <span className="service-name">{service.name}</span>
+                      <span className="service-price">${service.price}</span>
+                      {service.color && (
+                        <div
+                          className="service-color-indicator"
+                          style={{ backgroundColor: service.color }}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Selected Services List */}
+          {selectedServices.length > 0 && (
+            <div className="selected-services-section">
+              {selectedServices.map((service) => (
+                <div
+                  key={service.id}
+                  className="selected-service-item"
+                  style={{ backgroundColor: service.color + "30" || "#f3f4f6" }}
+                >
+                  <span className="service-name">{service.name}</span>
+                  <span className="service-price">${service.price}</span>
+                  <button
+                    type="button"
+                    className="remove-service-btn"
+                    onClick={() => removeService(service.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              <div className="total-section">
+                <span className="total-label">Total: ${calculateTotal()}</span>
+              </div>
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="service-search">Services (Required)</label>
-            {hasDeletedServices && (
-              <div className="warning-message">
-                ⚠️ Warning: Some services from this reservation have been
-                deleted. They have been automatically removed from the
-                selection.
-              </div>
-            )}
-            <input
-              id="service-search"
-              type="text"
-              placeholder="Search services..."
-              value={serviceSearch}
-              onChange={(e) => setServiceSearch(e.target.value)}
-              className="service-search"
-            />
-            <div className="services-list">
-              {filteredServices.map((service) => (
-                <label key={service.id} className="service-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={formData.service_ids.includes(service.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFormData({
-                          ...formData,
-                          service_ids: [...formData.service_ids, service.id],
-                        });
-                      } else {
-                        setFormData({
-                          ...formData,
-                          service_ids: formData.service_ids.filter(
-                            (id) => id !== service.id,
-                          ),
-                        });
-                      }
-                    }}
-                  />
-                  <span className="service-name">{service.name}</span>
-                  {service.color && (
-                    <div
-                      className="service-color-indicator"
-                      style={{ backgroundColor: service.color }}
-                    />
-                  )}
-                </label>
-              ))}
+          {selectedServices.length === 0 && (
+            <div className="no-services-message">
+              No services selected. Use the search bar above to add services.
             </div>
-            {formData.service_ids.length === 0 && (
-              <div className="form-error">
-                Please select at least one service
-              </div>
-            )}
-          </div>
+          )}
 
           <div className="modal-footer">
             {formData.id && (
@@ -265,9 +402,7 @@ export const ReservationModal = ({
             )}
             <Button
               type="submit"
-              disabled={
-                !formData.service_ids || formData.service_ids.length === 0
-              }
+              disabled={selectedServices.length === 0}
               className="save-btn"
             >
               Save

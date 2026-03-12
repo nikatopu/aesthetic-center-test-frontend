@@ -189,7 +189,7 @@ const SchedulePage = () => {
             {specialists.map((s) => (
               <div key={s.id} className="header-cell">
                 <img src={s.photo_url} alt="" />
-                <span>{s.name}</span>
+                <span>{`${s.name} ${s.surname}`}</span>
               </div>
             ))}
           </div>

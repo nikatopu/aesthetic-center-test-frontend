@@ -25,7 +25,9 @@ export const ReservationCard = ({ reservation }) => {
   const style = {
     top: `${calculatePosition(reservation.start_time)}px`,
     height: `${calculateHeight(reservation.duration_minutes)}px`,
-    backgroundColor: mainService?.color || "#3b82f6",
+    backgroundColor: mainService?.color + "30" || "#3b82f6",
+    color: mainService?.color || "#fff",
+    borderLeft: `2px solid`,
   };
 
   return (

@@ -12,6 +12,11 @@ body {
   background: var(--bg);
   color: var(--text);
 }
+
+* {
+  box-sizing: border-box;
+}
+
 .container {
   padding: 20px;
   max-width: 1200px;

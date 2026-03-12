@@ -95,7 +95,11 @@
   justify-content: flex-end;
   align-items: center;
   padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+}
+
+.modal-footer button {
+  width: 100%;
+  max-width: unset;
 }
 
 /* Responsive design */
