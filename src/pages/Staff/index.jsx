@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import { GlobalContext } from "../../store/GlobalContext";
+import { useState } from "react";
+import { useGlobalContext } from "../../store/GlobalContext";
 import { useToast } from "../../components/atoms/Toast/ToastProvider";
 import { SpecialistAPI } from "../../api/client";
 import { Button } from "../../components/atoms/Button";
@@ -7,7 +7,7 @@ import { StaffModal } from "../../components/organisms/StaffModal";
 import "./StaffPage.css";
 
 const StaffPage = () => {
-  const { specialists, refreshData } = useContext(GlobalContext);
+  const { specialists, refreshData } = useGlobalContext();
   const { showSuccess, showError } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);

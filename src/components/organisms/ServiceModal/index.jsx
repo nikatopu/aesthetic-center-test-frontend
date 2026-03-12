@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "../../atoms/Modal";
 import { Button } from "../../atoms/Button";
 import { useToast } from "../../atoms/Toast/ToastProvider";
-import { GlobalContext } from "../../../store/GlobalContext";
+import {  useGlobalContext } from "../../../store/GlobalContext";
 import { ServiceAPI } from "../../../api/client";
 import "./ServiceModal.css";
 
@@ -22,7 +22,7 @@ const PREDEFINED_COLORS = [
 ];
 
 export const ServiceModal = ({ isOpen, onClose, data, onSave }) => {
-  const { customFields, refreshData } = useContext(GlobalContext);
+  const { customFields, refreshData } = useGlobalContext();
   const { showError } = useToast();
   const [form, setForm] = useState({
     name: "",

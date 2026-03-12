@@ -1,35 +1,24 @@
-import React, { useState, useEffect, useContext } from "react";
-import { GlobalContext } from "../../store/GlobalContext";
+import { useState, useEffect } from "react";
+import { useGlobalContext } from "../../store/GlobalContext";
 import { useToast } from "../../components/atoms/Toast/ToastProvider";
 import { ReservationAPI } from "../../api/client";
 import { processReservation } from "../../utils/reservationUtils";
-import {
-  TIME_SLOTS,
-  calculatePosition,
-  calculateHeight,
-} from "../../utils/timeGrid";
+import { TIME_SLOTS, calculateHeight } from "../../utils/timeGrid";
 import { ReservationCard } from "../../components/organisms/ReservationCard";
 import { ReservationModal } from "../../components/organisms/ReservationModal";
 import { EmptyState } from "../../components/atoms/EmptyState";
 import "./SchedulePage.css";
 
 const SchedulePage = () => {
-  const { specialists, services } = useContext(GlobalContext);
+  const { specialists, services, selectedDate } = useGlobalContext();
   const { showSuccess, showError } = useToast();
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
   const [reservations, setReservations] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState(null);
   const [draggingRes, setDraggingRes] = useState(null);
   const [ghostPos, setGhostPos] = useState(null);
 
-  useEffect(() => {
-    fetchReservations();
-  }, [selectedDate]);
-
-  const fetchReservations = async () => {
+  async function fetchReservations() {
     try {
       const res = await ReservationAPI.getByDate(selectedDate);
       // Process reservations to handle deleted services gracefully
@@ -40,9 +29,13 @@ const SchedulePage = () => {
     } catch (err) {
       showError(err.response?.data?.error || "Failed to load reservations");
     }
-  };
+  }
 
-  const handleSaveReservation = async (formData) => {
+  useEffect(() => {
+    fetchReservations();
+  }, [selectedDate]);
+
+  async function handleSaveReservation(formData) {
     try {
       if (formData.id) {
         // Update existing reservation
@@ -61,7 +54,7 @@ const SchedulePage = () => {
     } catch (err) {
       showError(err.response?.data?.error || "Failed to save reservation");
     }
-  };
+  }
 
   const handleDeleteReservation = async (reservationId) => {
     try {
@@ -181,19 +174,12 @@ const SchedulePage = () => {
       <EmptyState
         message="No staff found."
         linkText="Add Staff"
-        linkTo="/staff"
+        linkTo="staff"
       />
     );
 
   return (
     <div className="schedule-page">
-      <div className="schedule-controls">
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
-      </div>
       <div className="schedule-container">
         <div className="grid-scroll">
           <div className="grid-header">

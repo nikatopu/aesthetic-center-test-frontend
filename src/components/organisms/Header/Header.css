@@ -1,0 +1,113 @@
+.header {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  height: 2em;
+  position: relative;
+}
+
+.navigation-links-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5em;
+  width: 100%;
+  height: 100%;
+}
+
+.nav-link {
+  background-color: transparent;
+  color: var(--text);
+  border: none;
+
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+.nav-link-active {
+  border-bottom: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.navigation-schedule-controls {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navigation-schedule-controls button {
+  background-color: transparent;
+  width: 1.75em;
+  height: 1.75em;
+  border: none;
+  cursor: pointer;
+}
+
+.navigation-schedule-controls button svg {
+  width: 100%;
+  height: auto;
+  fill: var(--text);
+  transition: fill 0.15s ease;
+}
+
+.navigation-schedule-controls button:hover svg {
+  fill: var(--primary);
+}
+
+.date-display-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.navigation-schedule-date-input {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0;
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+.formatted-date-display {
+  pointer-events: none;
+
+  font-size: 0.875rem;
+  color: var(--text);
+  font-weight: 500;
+  background-color: var(--background);
+  transition: border-color 0.15s ease;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.formatted-date-display:hover {
+  border-color: var(--primary);
+}

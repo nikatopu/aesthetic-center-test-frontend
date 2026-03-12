@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import { GlobalContext } from "../../store/GlobalContext";
+import { useState, useEffect } from "react";
+import { useGlobalContext } from "../../store/GlobalContext";
 import { useToast } from "../../components/atoms/Toast/ToastProvider";
 import { ServiceAPI } from "../../api/client";
 import { Button } from "../../components/atoms/Button";
@@ -8,7 +8,7 @@ import { CustomFieldModal } from "../../components/organisms/CustomFieldModal";
 import "./ServicesPage.css";
 
 const ServicesPage = () => {
-  const { services, customFields, refreshData } = useContext(GlobalContext);
+  const { services, customFields, refreshData } = useGlobalContext();
   const { showSuccess, showError } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);

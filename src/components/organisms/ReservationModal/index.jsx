@@ -1,7 +1,7 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "../../atoms/Modal";
 import { Button } from "../../atoms/Button";
-import { GlobalContext } from "../../../store/GlobalContext";
+import { useGlobalContext } from "../../../store/GlobalContext";
 import { validateServiceIds } from "../../../utils/reservationUtils";
 import { EmptyState } from "../../atoms/EmptyState";
 import "./ReservationModal.css";
@@ -13,7 +13,7 @@ export const ReservationModal = ({
   onSave,
   onDelete,
 }) => {
-  const { services, specialists } = useContext(GlobalContext);
+  const { services, specialists } = useGlobalContext();
   const [serviceSearch, setServiceSearch] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hasDeletedServices, setHasDeletedServices] = useState(false);
@@ -106,7 +106,7 @@ export const ReservationModal = ({
         <EmptyState
           message="No services found. Please create services first."
           linkText="Go to Services"
-          linkTo="/services"
+          linkTo="services"
         />
       ) : (
         <form onSubmit={handleSubmit} className="reservation-form">
