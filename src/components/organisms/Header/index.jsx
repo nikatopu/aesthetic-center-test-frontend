@@ -12,13 +12,28 @@ export default function Header() {
     { label: "Services", page: "services" },
   ];
 
+  // Utility function to safely parse date and format for display
   function formatDateDisplay(dateString) {
-    const date = new Date(dateString);
+    // Parse date as UTC to avoid timezone shifts
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
+  }
+
+  // Utility function to add/subtract days without timezone issues
+  function addDaysToDate(dateString, days) {
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() + days);
+
+    const newYear = date.getFullYear();
+    const newMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const newDay = String(date.getDate()).padStart(2, "0");
+    return `${newYear}-${newMonth}-${newDay}`;
   }
 
   function handleDateChange(e) {
@@ -32,15 +47,11 @@ export default function Header() {
   }
 
   function handlePreviousDay() {
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() - 1);
-    setSelectedDate(current.toISOString().split("T")[0]);
+    setSelectedDate(addDaysToDate(selectedDate, -1));
   }
 
   function handleNextDay() {
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() + 1);
-    setSelectedDate(current.toISOString().split("T")[0]);
+    setSelectedDate(addDaysToDate(selectedDate, 1));
   }
 
   return (

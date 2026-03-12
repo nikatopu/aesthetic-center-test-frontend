@@ -19,9 +19,37 @@ export const ReservationModal = ({
   const [hasDeletedServices, setHasDeletedServices] = useState(false);
   const [selectedServices, setSelectedServices] = useState([]);
 
+  // Helper function to format time for HTML time input (HH:MM)
+  const formatTimeForInput = (timeValue) => {
+    if (!timeValue) return "";
+
+    // If it's already in HH:MM format, return as-is
+    if (typeof timeValue === "string" && /^\d{2}:\d{2}$/.test(timeValue)) {
+      return timeValue;
+    }
+
+    // If it's in HH:MM:SS format (like "11:00:00"), extract HH:MM
+    if (
+      typeof timeValue === "string" &&
+      /^\d{2}:\d{2}:\d{2}$/.test(timeValue)
+    ) {
+      return timeValue.slice(0, 5); // "11:00:00" -> "11:00"
+    }
+
+    return timeValue;
+  };
+
   // Helper function to format date for HTML date input (yyyy-MM-dd)
+  // Ensures consistent timezone handling by avoiding Date object timezone conversion
   const formatDateForInput = (dateValue) => {
-    if (!dateValue) return new Date().toISOString().split("T")[0];
+    if (!dateValue) {
+      // Use UTC date to avoid timezone issues
+      const now = new Date();
+      const year = now.getUTCFullYear();
+      const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(now.getUTCDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
 
     // If it's already in the correct format (yyyy-MM-dd), return it as-is
     if (
@@ -33,32 +61,43 @@ export const ReservationModal = ({
 
     // Handle ISO datetime strings (extract date part without timezone conversion)
     if (typeof dateValue === "string") {
-      // For ISO strings like "2026-03-11T20:00:00.000Z", just take the date part
+      // For ISO strings like "2026-03-11T20:00:00.000Z", extract date part directly
       if (dateValue.includes("T") || dateValue.includes("Z")) {
         return dateValue.split("T")[0];
       }
 
-      // For other date strings, try to parse safely
-      const parsed = new Date(dateValue);
+      // For date-only strings, try regex extraction first
+      const dateMatch = dateValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (dateMatch) {
+        return `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+      }
+
+      // For other formats, parse with UTC to avoid timezone shifts
+      const parsed = new Date(
+        dateValue + (dateValue.includes("T") ? "" : "T12:00:00Z"),
+      );
       if (!isNaN(parsed.getTime())) {
-        // Use getFullYear, getMonth, getDate to avoid timezone issues
-        const year = parsed.getFullYear();
-        const month = String(parsed.getMonth() + 1).padStart(2, "0");
-        const day = String(parsed.getDate()).padStart(2, "0");
+        const year = parsed.getUTCFullYear();
+        const month = String(parsed.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(parsed.getUTCDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
       }
     }
 
-    // Handle Date objects
+    // Handle Date objects using UTC methods
     if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
-      const year = dateValue.getFullYear();
-      const month = String(dateValue.getMonth() + 1).padStart(2, "0");
-      const day = String(dateValue.getDate()).padStart(2, "0");
+      const year = dateValue.getUTCFullYear();
+      const month = String(dateValue.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(dateValue.getUTCDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     }
 
-    // Fallback to current date
-    return new Date().toISOString().split("T")[0];
+    // Fallback to current UTC date
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(now.getUTCDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   // Provide default values to prevent null/undefined errors
@@ -97,8 +136,10 @@ export const ReservationModal = ({
       initialData.date ||
       initialData.selected_date;
 
-    // Extract start time - try multiple field names
-    const startTime = initialData.start_time || initialData.time || "";
+    // Extract start time - try multiple field names and format for HTML time input
+    const startTime = formatTimeForInput(
+      initialData.start_time || initialData.time || "",
+    );
 
     // Check for deleted services if editing existing reservation
     if (initialData.service_ids) {
@@ -175,13 +216,19 @@ export const ReservationModal = ({
     for (let hour = 8; hour < 22; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const timeValue = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
-        const timeLabel = new Date(
-          `1970-01-01T${timeValue}:00`,
-        ).toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        });
+
+        // Format time label without timezone dependencies
+        let timeLabel;
+        if (hour === 0) {
+          timeLabel = `12:${minute.toString().padStart(2, "0")} AM`;
+        } else if (hour < 12) {
+          timeLabel = `${hour}:${minute.toString().padStart(2, "0")} AM`;
+        } else if (hour === 12) {
+          timeLabel = `12:${minute.toString().padStart(2, "0")} PM`;
+        } else {
+          timeLabel = `${hour - 12}:${minute.toString().padStart(2, "0")} PM`;
+        }
+
         times.push({ value: timeValue, label: timeLabel });
       }
     }
