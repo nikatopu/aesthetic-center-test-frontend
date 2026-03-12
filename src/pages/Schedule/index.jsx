@@ -3,7 +3,12 @@ import { useGlobalContext } from "../../store/GlobalContext";
 import { useToast } from "../../components/atoms/Toast/ToastProvider";
 import { ReservationAPI } from "../../api/client";
 import { processReservation } from "../../utils/reservationUtils";
-import { TIME_SLOTS, calculateHeight } from "../../utils/timeGrid";
+import {
+  TIME_SLOTS,
+  calculateHeight,
+  ROW_HEIGHT,
+  calculateGridHeight,
+} from "../../utils/timeGrid";
 import { ReservationCard } from "../../components/organisms/ReservationCard";
 import { ReservationModal } from "../../components/organisms/ReservationModal";
 import { EmptyState } from "../../components/atoms/EmptyState";
@@ -86,9 +91,9 @@ const SchedulePage = () => {
     const rect = e.currentTarget.getBoundingClientRect();
     const y = e.clientY - rect.top;
 
-    // Snap to 30-minute intervals (30px per 30-min slot)
-    const snappedY = Math.floor(y / 30) * 30;
-    const timeSlotIndex = Math.floor(snappedY / 30);
+    // Snap to 30-minute intervals based on ROW_HEIGHT
+    const snappedY = Math.floor(y / ROW_HEIGHT) * ROW_HEIGHT;
+    const timeSlotIndex = Math.floor(snappedY / ROW_HEIGHT);
 
     // Check if the time slot index is valid
     if (timeSlotIndex >= 0 && timeSlotIndex < TIME_SLOTS.length) {
@@ -179,7 +184,13 @@ const SchedulePage = () => {
     );
 
   return (
-    <div className="schedule-page">
+    <div
+      className="schedule-page"
+      style={{
+        "--row-height": `${ROW_HEIGHT}px`,
+        "--grid-height": `${calculateGridHeight()}px`,
+      }}
+    >
       <div className="schedule-container">
         <div className="grid-scroll">
           <div className="grid-header">
@@ -196,7 +207,11 @@ const SchedulePage = () => {
           <div className="grid-body">
             <div className="time-column">
               {TIME_SLOTS.map((slot) => (
-                <div key={slot} className="time-slot-label">
+                <div
+                  key={slot}
+                  className="time-slot-label"
+                  style={{ height: ROW_HEIGHT }}
+                >
                   {slot}
                 </div>
               ))}
@@ -212,7 +227,7 @@ const SchedulePage = () => {
                   <div
                     key={slot}
                     className="grid-slot"
-                    style={{ top: i * 30 }}
+                    style={{ top: i * ROW_HEIGHT, height: ROW_HEIGHT }}
                     onClick={() => handleGridClick(spec, slot)}
                   />
                 ))}

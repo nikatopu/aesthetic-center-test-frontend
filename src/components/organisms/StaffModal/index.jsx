@@ -137,10 +137,6 @@ export function StaffModal({ isOpen, onClose, data, onSave }) {
                 required
               />
             </div>
-
-            <Button type="submit" disabled={isUploading}>
-              {data?.id ? "Update Staff" : "Add Staff"}
-            </Button>
           </div>
 
           <div className="form-right-column">
@@ -191,11 +187,17 @@ export function StaffModal({ isOpen, onClose, data, onSave }) {
                 </div>
               )}
             </div>
-
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
           </div>
+        </div>
+
+        <div className="modal-footer">
+          <Button type="submit" disabled={isUploading}>
+            {data?.id ? "Update Staff" : "Add Staff"}
+          </Button>
+
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
         </div>
 
         <input

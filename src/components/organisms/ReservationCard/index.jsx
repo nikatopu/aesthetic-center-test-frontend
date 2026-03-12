@@ -47,7 +47,7 @@ export const ReservationCard = ({ reservation }) => {
         {additionalServices.length > 0 && (
           <ul className="extra-services">
             {additionalServices.map((s) => (
-              <li key={s.id}>• {s.name}</li>
+              <li key={s.id}>• {s.name}.</li>
             ))}
           </ul>
         )}
@@ -60,7 +60,7 @@ export const ReservationCard = ({ reservation }) => {
             {getEndTime(reservation.start_time, reservation.duration_minutes)}
           </div>
           <div className="specialist-name">
-            {reservation.specialist_short_name || reservation.specialist_name}
+            {reservation.specialist_name} {reservation.specialist_surname.charAt(0)}
           </div>
         </div>
       </div>

@@ -19,11 +19,53 @@ export const ReservationModal = ({
   const [hasDeletedServices, setHasDeletedServices] = useState(false);
   const [selectedServices, setSelectedServices] = useState([]);
 
+  // Helper function to format date for HTML date input (yyyy-MM-dd)
+  const formatDateForInput = (dateValue) => {
+    if (!dateValue) return new Date().toISOString().split("T")[0];
+
+    // If it's already in the correct format (yyyy-MM-dd), return it as-is
+    if (
+      typeof dateValue === "string" &&
+      /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
+    ) {
+      return dateValue;
+    }
+
+    // Handle ISO datetime strings (extract date part without timezone conversion)
+    if (typeof dateValue === "string") {
+      // For ISO strings like "2026-03-11T20:00:00.000Z", just take the date part
+      if (dateValue.includes("T") || dateValue.includes("Z")) {
+        return dateValue.split("T")[0];
+      }
+
+      // For other date strings, try to parse safely
+      const parsed = new Date(dateValue);
+      if (!isNaN(parsed.getTime())) {
+        // Use getFullYear, getMonth, getDate to avoid timezone issues
+        const year = parsed.getFullYear();
+        const month = String(parsed.getMonth() + 1).padStart(2, "0");
+        const day = String(parsed.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+    }
+
+    // Handle Date objects
+    if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
+      const year = dateValue.getFullYear();
+      const month = String(dateValue.getMonth() + 1).padStart(2, "0");
+      const day = String(dateValue.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    // Fallback to current date
+    return new Date().toISOString().split("T")[0];
+  };
+
   // Provide default values to prevent null/undefined errors
   const getDefaultFormData = () => ({
     specialist_id: null,
     start_time: "",
-    reservation_date: new Date().toISOString().split("T")[0],
+    reservation_date: formatDateForInput(),
     duration_minutes: 60,
     service_ids: [],
     ...initialData,
@@ -33,28 +75,62 @@ export const ReservationModal = ({
 
   // Update form data when initialData changes
   useEffect(() => {
-    const defaultData = getDefaultFormData();
+    if (!initialData) {
+      // Completely new reservation
+      setFormData({
+        specialist_id: null,
+        start_time: "",
+        reservation_date: formatDateForInput(),
+        duration_minutes: 60,
+        service_ids: [],
+      });
+      setSelectedServices([]);
+      setHasDeletedServices(false);
+      setServiceSearch("");
+      setShowDeleteConfirm(false);
+      return;
+    }
+
+    // Extract date - try multiple field names that might contain the date
+    const reservationDate =
+      initialData.reservation_date ||
+      initialData.date ||
+      initialData.selected_date;
+
+    // Extract start time - try multiple field names
+    const startTime = initialData.start_time || initialData.time || "";
 
     // Check for deleted services if editing existing reservation
-    if (initialData?.service_ids) {
+    if (initialData.service_ids) {
       const validation = validateServiceIds(initialData.service_ids, services);
       setHasDeletedServices(validation.hasDeleted);
-
-      // Update form data with only valid service IDs
-      setFormData({
-        ...defaultData,
-        service_ids: validation.validIds,
-      });
 
       // Set selected services for display
       const validServices = services.filter((service) =>
         validation.validIds.includes(service.id),
       );
       setSelectedServices(validServices);
+
+      setFormData({
+        specialist_id: initialData.specialist_id,
+        start_time: startTime,
+        reservation_date: formatDateForInput(reservationDate),
+        duration_minutes: initialData.duration_minutes || 60,
+        service_ids: validation.validIds,
+        id: initialData.id,
+      });
     } else {
-      setFormData(defaultData);
-      setHasDeletedServices(false);
+      // New reservation or reservation without services
+      setFormData({
+        specialist_id: initialData.specialist_id || null,
+        start_time: startTime,
+        reservation_date: formatDateForInput(reservationDate),
+        duration_minutes: initialData.duration_minutes || 60,
+        service_ids: [],
+        id: initialData.id,
+      });
       setSelectedServices([]);
+      setHasDeletedServices(false);
     }
 
     setServiceSearch("");
